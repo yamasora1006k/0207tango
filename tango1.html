@@ -1,0 +1,209 @@
+<!-- @format -->
+
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>英単語反復練習装置</title>
+    <style>
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        flex-direction: column;
+      }
+      #wordDisplay {
+        font-size: 32px;
+        margin: 20px 0;
+      }
+      .buttons {
+        display: flex;
+        justify-content: center;
+      }
+      .button {
+        font-size: 16px;
+        padding: 5px 15px;
+        margin: 0 10px;
+      }
+      #timeInputContainer {
+        margin-top: 10px;
+      }
+      #timeInput {
+        font-size: 16px;
+        padding: 5px;
+        margin-right: 10px;
+      }
+    </style>
+    <script>
+      class Word {
+        constructor(english, japanese) {
+          this.english = english;
+          this.japanese = japanese;
+          this.displayLanguage = "english";
+        }
+
+        getWord() {
+          let word =
+            this.displayLanguage === "english" ? this.english : this.japanese;
+          this.displayLanguage =
+            this.displayLanguage === "english" ? "japanese" : "english";
+          return word;
+        }
+      }
+
+      class App {
+        constructor() {
+          this.words = [
+            new Word("北極", "The Arctic"),
+            new Word("ホッキョクグマ", "Polar bear"),
+            new Word("溶ける", "melt"),
+            new Word("ソリ", "sled"),
+            new Word("装置 設備 備品", "equipment"),
+            new Word("ひく", "pull"),
+            new Word("-につき -あたり", "per"),
+            new Word("突然", "suddenly"),
+            new Word("怖がらせる", "scare"),
+            new Word("構築する 建設する", "construct"),
+            new Word("首都", "capital"),
+            new Word("-に囲まれている", "be surrounded by -"),
+            new Word("超高層ビル群 摩天楼", "Sky scrapers"),
+            new Word("人目をひく 目立つ", "eye-catching"),
+            new Word("非常に大きな 巨大な", "enormous"),
+            new Word("-を含む", "include"),
+            new Word("都会の", "urban"),
+            new Word("気持ちの良い", "pleasant"),
+            new Word("極端な気候", "extreme climate"),
+            new Word("居住者", "resident"),
+            new Word("衛星", "satellite"),
+            new Word("迷子になる", "get lost"),
+            new Word("信号", "signal"),
+            new Word("解決する 把握する", "figure out"),
+            new Word("正確に", "exactly"),
+            new Word("予測する 予報する", "predict"),
+            new Word("パラボラアンテナ", "satellite dish"),
+            new Word("自然保護活動家", "conservationist"),
+            new Word("非常に とても", "critically"),
+            new Word("考古学者", "archaeologist"),
+            new Word("正確な", "accurate"),
+            new Word("探偵の 探知用の", "detective"),
+            new Word("共通している", "have in common"),
+            new Word("職業", "profession"),
+            new Word("半島", "peninsula"),
+            new Word("-を探す", "look for -"),
+            new Word("古代の", "ancient"),
+            new Word("人工物", "artifact"),
+            new Word("ヒント 手がかり", "clue"),
+            new Word("-を訓練する", "train"),
+            new Word("職業選択", "career choice"),
+            new Word("考慮する", "consider"),
+            new Word("危険を冒す リスクを取る", "take risks"),
+            new Word("情熱", "passion"),
+            new Word("極端な 危険をはらんだ", "extreme"),
+            new Word("-しながら", "while -ing"),
+            new Word("ほとんどない", "few"),
+            new Word("惑星化学者", "planetary scientist"),
+            new Word("微細な 極小の", "microscopic"),
+            new Word("-の下に", "underneath"),
+            new Word("… が - するのを助ける", "help … [ to ] do -"),
+            new Word("(映画で人を)主役にする (歌手を)客演させる", "feature"),
+          ];
+
+          this.currentIndex = 0;
+          this.isAutoPlay = false;
+          this.intervalTime = 2000; // デフォルトは2秒
+          this.displayWord();
+        }
+
+        displayWord() {
+          document.getElementById("wordDisplay").innerText =
+            this.words[this.currentIndex].getWord();
+          if (this.words[this.currentIndex].displayLanguage === "english") {
+            this.currentIndex = (this.currentIndex + 1) % this.words.length;
+          }
+        }
+
+        nextWord() {
+          this.displayWord();
+        }
+
+        prevWord() {
+          this.currentIndex =
+            (this.currentIndex - 2 + this.words.length * 2) % this.words.length;
+          this.words[this.currentIndex].displayLanguage = "english";
+          this.displayWord();
+        }
+
+        toggleAutoPlay() {
+          if (this.isAutoPlay) {
+            this.stopAutoPlay();
+          } else {
+            this.startAutoPlay();
+          }
+        }
+
+        startAutoPlay() {
+          this.isAutoPlay = true;
+          document.getElementById("auto").innerText = "ストップ";
+          this.autoPlayInterval = setInterval(
+            () => this.nextWord(),
+            this.intervalTime
+          );
+        }
+
+        stopAutoPlay() {
+          clearInterval(this.autoPlayInterval);
+          this.isAutoPlay = false;
+          document.getElementById("auto").innerText = "オート";
+        }
+
+        updateIntervalTime() {
+          const timeInput = parseFloat(
+            document.getElementById("timeInput").value
+          );
+          if (!isNaN(timeInput) && timeInput > 0) {
+            this.intervalTime = timeInput * 1000; // 秒数をミリ秒に変換
+            if (this.isAutoPlay) {
+              this.stopAutoPlay();
+              this.startAutoPlay();
+            }
+          }
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const app = new App();
+
+        document
+          .getElementById("prev")
+          .addEventListener("click", () => app.prevWord());
+        document
+          .getElementById("next")
+          .addEventListener("click", () => app.nextWord());
+        document
+          .getElementById("auto")
+          .addEventListener("click", () => app.toggleAutoPlay());
+        document
+          .getElementById("execute")
+          .addEventListener("click", () => app.updateIntervalTime());
+      });
+    </script>
+  </head>
+  <body>
+    <span>日 → 英</span>
+    <div id="wordDisplay"></div>
+    <div class="buttons">
+      <button id="prev" class="button">戻る</button>
+      <button id="next" class="button">次へ</button>
+      <button id="auto" class="button">オート</button>
+    </div>
+    <div id="timeInputContainer">
+      <input
+        type="number"
+        id="timeInput"
+        step="0.1"
+        placeholder="秒数を入力（例: 2）" />
+      <button id="execute" class="button">実行</button>
+    </div>
+  </body>
+</html>
